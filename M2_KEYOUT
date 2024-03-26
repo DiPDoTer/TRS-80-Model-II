@@ -1,0 +1,42 @@
+//**************************************************************//
+//  Desc    : Send a string to the TRS-80 Model II              //
+//            keyboard interface - using Arduino shiftOut       //
+//  Version : 1.1                                               //
+//**************************************************************//
+
+int busyPin    = 8;
+int dataPin    = 11;
+int clockPin   = 12;
+char cString[] = " THIS IS A TEST OF SENDING KEYBOARD SIGNALS TO THE TRS-80 MODEL II!";
+int x = 0;
+
+void setup()
+{
+  pinMode(busyPin,  INPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin,  OUTPUT);
+  digitalWrite(dataPin, HIGH);
+  cString[0] = 13;
+}
+
+void loop()
+{  
+  delay(1000);
+  // Output to the data pins but only when busy pin is HIGH
+  for (int j = 0; j < strlen(cString); j++) 
+  {
+    if (digitalRead(busyPin))
+    {
+      digitalWrite(dataPin, HIGH);
+      shiftOut(dataPin, clockPin, LSBFIRST, cString[j]);
+      digitalWrite(dataPin, HIGH);
+      // Add the "End of Data" Pulse that the Model II hardware is expecting
+      delayMicroseconds(5);
+      digitalWrite(dataPin, LOW);
+      delayMicroseconds(5);
+      digitalWrite(dataPin, HIGH);
+      delay(150);
+    }
+  }
+  delay(1000);
+}
